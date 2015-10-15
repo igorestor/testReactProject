@@ -1,0 +1,20 @@
+{
+  "name": "myProject",
+  "version": "0.0.1",
+  "author": "Willy Barankin",
+  "description": "",
+  "dependencies": {
+    "react": "latest",
+    "react-dom": "latest",
+    "flux": "latest"
+  },
+  "devDependencies": {
+    "grunt": "latest",
+    "grunt-http-server": "latest",
+    "grunt-jsmin-sourcemap": "latest",
+    "browserify": "latest",
+    "grunt-browserify": "latest",
+    "babelify": "latest",
+    "grunt-contrib-watch": "latest"
+  }
+}
