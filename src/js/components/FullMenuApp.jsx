@@ -6,8 +6,9 @@ var _ = require('underscore');
 
 function getMenuState() {
     return {
-        allMenu: {
-            menu1: {
+        allMenu: [
+            {
+                id: 'menu1',
                 name: 'test menu 1',
                 buttons: {
                     button1: {
@@ -21,7 +22,8 @@ function getMenuState() {
                     }
                 }
             },
-            menu2: {
+            {
+                id: 'menu2',
                 name: 'test menu 2',
                 buttons: {
                     button1: {
@@ -32,16 +34,16 @@ function getMenuState() {
                     }
                 }
             }
-        }
+        ]
     }
 }
 
 var FullMenuApp = React.createClass({
 
-    menuBlocks: [],
-
-    addMenuBlock(blockKey, blockVal) {
-        this.menuBlocks.push(<MenuBlock key={blockKey} contents={blockVal} />)
+    getMenuBlocks(allMenu) {
+        return _.map(allMenu, function(content){
+            return (<MenuBlock key={content.id} contents={content} />)
+        });
     },
 
     getInitialState: function() {
@@ -52,25 +54,9 @@ var FullMenuApp = React.createClass({
     // componentWillUnmount - отписать стор от обновлений
 
     render: function() {
-
-        var __this = this;
-
-        //var allTodos = this.props.allTodos;
-        //var todos = [];
-
-        //for (var key in allTodos) {
-        //    todos.push(<TodoItem key={key} todo={allTodos[key]} />);
-        //}
-
-
-        _.mapObject(this.state.allMenu, function(val, key){
-            __this.addMenuBlock(key, val);
-        });
-
-
         return (
             <div>
-                {this.menuBlocks}
+                {this.getMenuBlocks(this.state.allMenu)}
             </div>
         )
     }
