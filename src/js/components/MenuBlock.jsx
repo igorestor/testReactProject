@@ -2,16 +2,17 @@ var React = require('react');
 var ButtonElement = require('../components/ButtonElement.jsx');
 
 var MenuBlock = React.createClass({
+
+    getButtons(buttonsList) {
+        return buttonsList.map(function(button) {
+            return (<ButtonElement key={button.id} name={button.name}/>);
+        })
+    },
+
     render: function() {
-
-        var buttonList = ['test1', 'test2' , 'test3'];
-        var buttonMap = [];
-
-        buttonList.map(function(button) {buttonMap.push(<ButtonElement name={button}/>)});
-
         return (
             <div className="menuBlock">
-                {buttonMap}
+                {this.getButtons(this.props.menuInfo.buttons)}
             </div>
         )
     }

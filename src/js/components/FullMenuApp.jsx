@@ -1,6 +1,5 @@
 var React = require('react');
 var MenuBlock = require('../components/MenuBlock.jsx');
-var _ = require('underscore');
 
 /* Тут будем загружать и создавать менюхи */
 
@@ -10,29 +9,34 @@ function getMenuState() {
             {
                 id: 'menu1',
                 name: 'test menu 1',
-                buttons: {
-                    button1: {
+                buttons: [
+                    {
+                        id: 'button1-1',
                         name: 'button 1-1'
                     },
-                    button2: {
+                    {
+                        id: 'button1-2',
                         name: 'button 1-2'
                     },
-                    button3: {
+                    {
+                        id: 'button1-3',
                         name: 'button 1-3'
                     }
-                }
+                ]
             },
             {
                 id: 'menu2',
                 name: 'test menu 2',
-                buttons: {
-                    button1: {
+                buttons: [
+                    {
+                        id: 'button2-1',
                         name: 'button 2-1'
                     },
-                    button2: {
+                    {
+                        id: 'button2-2',
                         name: 'button 2-2'
                     }
-                }
+                ]
             }
         ]
     }
@@ -40,18 +44,18 @@ function getMenuState() {
 
 var FullMenuApp = React.createClass({
 
-    getMenuBlocks(allMenu) {
-        return _.map(allMenu, function(content){
-            return (<MenuBlock key={content.id} contents={content} />)
-        });
-    },
-
     getInitialState: function() {
         return getMenuState();
     },
 
     // componentDidMount - подписать стор под обнволение
     // componentWillUnmount - отписать стор от обновлений
+
+    getMenuBlocks(allMenu) {
+        return allMenu.map(function(content){
+            return (<MenuBlock key={content.id} menuInfo={content} />)
+        });
+    },
 
     render: function() {
         return (

@@ -6,8 +6,7 @@
   "dependencies": {
     "react": "latest",
     "react-dom": "latest",
-    "flux": "latest",
-    "underscore": "latest"
+    "flux": "latest"
   },
   "devDependencies": {
     "grunt": "latest",
