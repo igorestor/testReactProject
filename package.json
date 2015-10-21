@@ -6,7 +6,9 @@
   "dependencies": {
     "react": "latest",
     "react-dom": "latest",
-    "flux": "latest"
+    "flux": "latest",
+    "keymirror": "latest",
+    "object-assign": "latest"
   },
   "devDependencies": {
     "grunt": "latest",

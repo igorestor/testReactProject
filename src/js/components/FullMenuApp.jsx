@@ -1,66 +1,60 @@
 var React = require('react');
 var MenuBlock = require('../components/MenuBlock.jsx');
-
-/* Тут будем загружать и создавать менюхи */
+var MenuStore = require('../stores/MenuStore.jsx');
 
 function getMenuState() {
     return {
-        allMenu: [
-            {
-                id: 'menu1',
-                name: 'test menu 1',
-                buttons: [
-                    {
-                        id: 'button1-1',
-                        name: 'button 1-1'
-                    },
-                    {
-                        id: 'button1-2',
-                        name: 'button 1-2'
-                    },
-                    {
-                        id: 'button1-3',
-                        name: 'button 1-3'
-                    }
-                ]
-            },
-            {
-                id: 'menu2',
-                name: 'test menu 2',
-                buttons: [
-                    {
-                        id: 'button2-1',
-                        name: 'button 2-1'
-                    },
-                    {
-                        id: 'button2-2',
-                        name: 'button 2-2'
-                    }
-                ]
-            }
-        ]
-    }
+        allMenu: require('../data/menu.json'),
+        btnState: MenuStore.getState()
+    };
 }
 
 var FullMenuApp = React.createClass({
+
+    _onUpdate: function() {
+        this.setState(getMenuState());
+    },
 
     getInitialState: function() {
         return getMenuState();
     },
 
-    // componentDidMount - подписать стор под обнволение
+    componentDidMount: function() {
+        //MenuStore.addEventListener(this._onUpdate);
+    },
+
     // componentWillUnmount - отписать стор от обновлений
 
     getMenuBlocks(allMenu) {
-        return allMenu.map(function(content){
-            return (<MenuBlock key={content.id} menuInfo={content} />)
-        });
+        return allMenu.map(
+            (content) => (<MenuBlock key={content.id} menuInfo={content} onTest={this.setMyState}/>)
+        );
+    },
+
+    getStatusString(currentMenu, currentState) {
+
+        var __checkStatusString = (key) => (currentState[key]?'YES':'NO');
+
+        return (
+            currentMenu.map(
+                (menuElement) => (
+                    menuElement.buttons.map(
+                        (buttonElement) => (
+                            <p key={buttonElement.id}>
+                                {buttonElement.name} - {__checkStatusString(buttonElement.id)}
+                            </p>
+                        )
+                    )
+                )
+            )
+        );
     },
 
     render: function() {
         return (
             <div>
-                {this.getMenuBlocks(this.state.allMenu)}
+                <div>{this.getMenuBlocks(this.state.allMenu)}</div>
+                <div className='info-block'>{this.getStatusString(this.state.allMenu, this.state.btnState)}</div>
             </div>
         )
     }
