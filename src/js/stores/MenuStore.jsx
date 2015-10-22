@@ -5,10 +5,26 @@ var assign = require('object-assign');
 
 var CHANGE_EVENT = 'change';
 
-var _menuState = {};
+var _elements = [];
+var _groups = [];
 
-function update(id, updates) {
-    _menuState[id] = assign({}, _menuState[id], updates);
+function _disable(element) {
+    var id = element.id;
+    var group = element.group;
+
+    _elements = _elements.map((element) =>
+        (assign({}, element, (element.id == id && element.group == group)? {isActive: false}: {}))
+    );
+}
+
+function _enable(element) {
+    var id = element.id;
+    var group = element.group;
+
+    _elements = _elements.map((element) =>
+            (assign({}, element, (element.group == group)? (
+                (element.id == id)? {isActive: true} : {isActive: false}) : {}))
+    );
 }
 
 var MenuStore = assign({}, EventEmitter.prototype, {
@@ -16,53 +32,36 @@ var MenuStore = assign({}, EventEmitter.prototype, {
         this.on(CHANGE_EVENT, callback);
     },
 
+    removeChangeListener: function(callback) {
+        this.removeListener(CHANGE_EVENT, callback);
+    },
+
     emitChange: function() {
-        console.log(_menuState);
         this.emit(CHANGE_EVENT);
     },
 
-    getState: function() {
-        return _menuState;
+    getAllGroups: function() {
+        return _groups;
     },
 
-
-
-
-    /** NEW */
-    getButtonsForBlock: function(blockId) {
-        console.log('load block: '+blockId);
-        return ([
-                {
-                    "id": "button1-1",
-                    "name": "button 1-1"
-                },
-                {
-                    "id": "button1-2",
-                    "name": "button 1-2"
-                },
-                {
-                    "id": "button1-3",
-                    "name": "button 1-3"
-                }
-            ]
-        )
-
+    getElementsForGroup: function(groupId) {
+        return _elements.filter((elem) => elem.group == groupId);
     }
-
-
-
 });
 
 AppDispatcher.register( function(action) {
-    console.log(action);
     switch (action.actionType) {
-        case MenuConstants.MENU_ENABLE:
-            //update(action.id, {'isActive': true});
-            //MenuStore.emitChange();
+        case MenuConstants.RECEIVE_RAW_MENU:
+            _elements = action.rawMenu.elements;
+            _groups = action.rawMenu.groups;
             break;
-        case MenuConstants.MENU_DISABLE:
-            //update(action.id, {'isActive': false});
-            //MenuStore.emitChange();
+        case MenuConstants.ELEMENT_ENABLE:
+            _enable({id: action.id, group: action.group});
+            MenuStore.emitChange();
+            break;
+        case MenuConstants.ELEMENT_DISABLE:
+            _disable({id: action.id, group: action.group});
+            MenuStore.emitChange();
             break;
         default:
             break;

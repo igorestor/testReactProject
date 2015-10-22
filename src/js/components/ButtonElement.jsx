@@ -8,8 +8,11 @@ var ButtonElement = React.createClass({
     },
 
     render: function() {
+        var btnClass = this.props.buttonInfo.isActive?'active':'';
         return (
-            <button onClick={this._onToggleButton}>{this.props.buttonInfo.name}</button>
+            <button className={btnClass} onClick={this._onToggleButton}>
+                {this.props.buttonInfo.name}
+            </button>
         )
     }
 });

@@ -1,7 +1,7 @@
 var keyMirror = require('keymirror');
 
 module.exports = keyMirror({
-    MENU_ENABLE: null,
-    MENU_DISABLE: null,
-    RECEIVE_RAW_MESSAGES: null
+    ELEMENT_ENABLE: null,
+    ELEMENT_DISABLE: null,
+    RECEIVE_RAW_MENU: null
 });
