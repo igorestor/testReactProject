@@ -8,7 +8,8 @@
     "react-dom": "latest",
     "flux": "latest",
     "keymirror": "latest",
-    "object-assign": "latest"
+    "object-assign": "latest",
+    "three": "latest"
   },
   "devDependencies": {
     "grunt": "latest",
@@ -17,6 +18,8 @@
     "browserify": "latest",
     "grunt-browserify": "latest",
     "babelify": "latest",
-    "grunt-contrib-watch": "latest"
+    "grunt-contrib-watch": "latest",
+    "babel-preset-react": "latest",
+    "babel-preset-es2015": "latest"
   }
 }
