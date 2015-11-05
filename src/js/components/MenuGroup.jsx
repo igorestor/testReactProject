@@ -1,6 +1,7 @@
 var React = require('react');
 var ButtonElement = require('../components/ButtonElement.jsx');
 var MenuStore = require('../stores/MenuStore.jsx');
+var ThreeUtils =require('../utils/ThreeUtils.jsx');
 
 function getElementsGroupFromStores(groupId) {
     return {
@@ -19,12 +20,17 @@ var MenuBlock = React.createClass({
         this.setState(getElementsGroupFromStores(this.props.groupInfo.id));
     },
 
+    componentWillUpdate: function() {
+        ThreeUtils.updateGroup(this.props.groupInfo.id);
+    },
+
     componentDidMount: function() {
         MenuStore.addEventListener(this._onUpdate);
+        ThreeUtils.updateGroup(this.props.groupInfo.id);
     },
 
     componentWillUnmount: function() {
-        MenuStore.removeChangeListener(this._onChange);
+        //MenuStore.removeChangeListener(this._onChange);
     },
 
     getInitialState: function() {

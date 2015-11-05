@@ -2,12 +2,12 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 
 var ThreeUtils = require('./utils/ThreeUtils.jsx');
-//ThreeUtils.init();
-ThreeUtils.addModel();
-//ThreeUtils.animate();
+ThreeUtils.init();
 
-window.ThreeUtils = ThreeUtils;
+//TODO: off
+//ThreeUtils.addModel();
 
+ThreeUtils.animate();
 
 var FullMenuApp = require('./components/FullMenuApp.jsx');
 

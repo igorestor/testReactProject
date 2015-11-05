@@ -46,6 +46,11 @@ var MenuStore = assign({}, EventEmitter.prototype, {
 
     getElementsForGroup: function(groupId) {
         return _elements.filter((elem) => elem.group == groupId);
+    },
+
+    getActiveElementsForGroup: function(groupId) {
+        var elementsOnGroup = this.getElementsForGroup(groupId);
+        return elementsOnGroup.filter((el) => el.isActive);
     }
 });
 

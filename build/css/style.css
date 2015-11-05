@@ -1,0 +1,39 @@
+h1 {
+    color: red;
+}
+h4 {
+    margin: 0 0 10px 0;
+}
+p {
+
+}
+h2 {
+
+}
+
+
+
+.menuBlock {
+    border: 1px solid red;
+    float: left;
+    width: 100px;
+    padding: 10px 25px;
+    margin: 20px;
+
+    z-index: 100;
+    background: #0086B3;
+
+    opacity: 0.8;
+}
+
+.info-block {
+    clear: both;
+}
+
+.active {
+    background-color: yellow;
+}
+
+#content {
+    position: absolute;
+}
