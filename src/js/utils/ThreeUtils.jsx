@@ -5,7 +5,11 @@ var container,
     mouseX = 0, mouseY = 0,
 
     windowHalfX = (window.innerWidth / 2),
-    windowHalfY = (window.innerHeight / 2);
+    windowHalfY = (window.innerHeight / 2),
+
+    controls, stats, mesh,
+
+    skybox, plane;
 
 
 var manager = new THREE.LoadingManager();
@@ -23,17 +27,52 @@ var onError = function ( xhr ) {
 };
 var texture = new THREE.Texture();
 
+
+/** GUI Control */
+var controlsGui = new function() {
+    this.panoramY = 2469;
+//    this.planeSize = 400;
+};
+var gui = new dat.GUI();
+gui.add(controlsGui, 'panoramY',0,2500);
+//gui.add(controlsGui, 'planeSize',0,1000);
+
+
 function _init() {
-
-    container = document.createElement( 'div' );
-    document.body.appendChild( container );
-
-    camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-    camera.position.z = 100;
-
+    /** SCENE */
     scene = new THREE.Scene();
 
-    //var ambient = new THREE.AmbientLight( 0x101030 );
+
+    /** CAMERA */
+    var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
+    var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
+    camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+    camera.position.x = 250;
+    camera.position.y = 350;
+    camera.position.z = 500;
+    scene.add(camera);
+
+
+    /** RENDERER */
+    renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+    container = document.createElement( 'div' );
+    document.body.appendChild( container );
+    container.appendChild(renderer.domElement);
+
+
+    /** CONTROLS */
+    controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+    controls.maxPolarAngle = Math.PI/2; //ground limit
+
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.25;
+    controls.enableZoom = true;
+
+
+    /** LIGHT */
     var ambient = new THREE.AmbientLight( 0xffffff );
     scene.add( ambient );
 
@@ -42,64 +81,68 @@ function _init() {
     scene.add( directionalLight );
 
 
+    /** SKYBOX/FOG */
+    var materialArray = [];
+    materialArray.push(new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('3d/test/dawnmountain-xpos.png')}));
+    materialArray.push(new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('3d/test/dawnmountain-xneg.png')}));
+    materialArray.push(new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('3d/test/dawnmountain-ypos.png')}));
+    materialArray.push(new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('3d/test/dawnmountain-yneg.png')}));
+    materialArray.push(new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('3d/test/dawnmountain-zpos.png')}));
+    materialArray.push(new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('3d/test/dawnmountain-zneg.png')}));
+    for (var i = 0; i < 6; i++)
+        materialArray[i].side = THREE.BackSide;
+    var skyboxMaterial = new THREE.MeshFaceMaterial(materialArray);
 
+    var skyboxGeom = new THREE.CubeGeometry(5000, 5000, 5000, 1, 1, 1);
+
+    skybox = new THREE.Mesh(skyboxGeom, skyboxMaterial);
+    skybox.position.y = 2469;
+    scene.add(skybox);
+
+
+    manager.onProgress = function ( item, loaded, total ) {
+        console.log( item, loaded, total );
+    };
+
+    window.addEventListener( 'resize', onWindowResize, false );
+
+
+    /** TEXTURE (__helper__) */
+    var loader = new THREE.ImageLoader( manager );
+    loader.load( '3d/textures/texture.jpg', function ( image ) {
+        texture.image = image;
+        texture.needsUpdate = true;
+    } );
+
+
+    /** STATS (__helper__) */
+    stats = new Stats();
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.bottom = '10px';
+    stats.domElement.style.right = '10px';
+    stats.domElement.style.zIndex = 100;
+    container.appendChild( stats.domElement );
+
+
+    /** AXES (__helpers__) */
     var axes = new THREE.AxisHelper( 200 );
     axes.position.y = -30;
     scene.add(axes);
     var planeGeometry = new THREE.PlaneGeometry(400,400);
     var planeMaterial = new THREE.MeshBasicMaterial(
-        {color: 0x457f32});
-    var plane = new THREE.Mesh(planeGeometry,planeMaterial);
+        {color: 0x457f32, wireframe: false });
+    plane = new THREE.Mesh(planeGeometry,planeMaterial);
     plane.rotation.x = -0.5*Math.PI;
     plane.position.x = 0;
     plane.position.y = -30;
     plane.position.z = 0;
     scene.add(plane);
-
-
-
-
-
-
-
-    //var manager = new THREE.LoadingManager();
-    manager.onProgress = function ( item, loaded, total ) {
-
-        console.log( item, loaded, total );
-
-    };
-
-//        var texture = new THREE.Texture();
-
-//        var onProgress = function ( xhr ) {
-//            if ( xhr.lengthComputable ) {
-//                var percentComplete = xhr.loaded / xhr.total * 100;
-//                console.log( Math.round(percentComplete, 2) + '% downloaded' );
-//            }
-//        };
-
-
-
-    var loader = new THREE.ImageLoader( manager );
-    loader.load( '3d/textures/texture.jpg', function ( image ) {
-
-        texture.image = image;
-        texture.needsUpdate = true;
-
-    } );
-
-    renderer = new THREE.WebGLRenderer();
-    renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( window.innerWidth, window.innerHeight );
-    container.appendChild( renderer.domElement );
-
-    document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-    window.addEventListener( 'resize', onWindowResize, false );
 }
 
+
 function onWindowResize() {
-    windowHalfX = window.innerWidth / 2;
-    windowHalfY = window.innerHeight / 2;
+    //windowHalfX = window.innerWidth / 2;
+    //windowHalfY = window.innerHeight / 2;
 
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -107,35 +150,24 @@ function onWindowResize() {
     renderer.setSize( window.innerWidth, window.innerHeight );
 }
 
-function onDocumentMouseMove( event ) {
-    mouseX = ( event.clientX - windowHalfX ) / 2;
-    mouseY = ( event.clientY - windowHalfY ) / 2;
-}
+//function onDocumentMouseMove( event ) {
+//    mouseX = ( event.clientX - windowHalfX ) / 2;
+//    mouseY = ( event.clientY - windowHalfY ) / 2;
+//}
 
 function _animate() {
     requestAnimationFrame( _animate );
+
+    controls.update();
+    stats.update();
     render();
 }
 
 function render() {
-    camera.position.x += ( mouseX - camera.position.x ) * .05;
-    camera.position.y += ( - mouseY - camera.position.y ) * .05;
-    camera.lookAt( scene.position );
+    //TODO: For tuning
+    skybox.position.y = controlsGui.panoramY;
+
     renderer.render( scene, camera );
-}
-
-function test() {
-    var ttt = (scene.children);
-
-    for (var i in ttt) {
-        console.log(i);
-        console.log(ttt[i]['type']);
-
-        if ('Object3D' == ttt[i]['type']) {
-            scene.remove(ttt[i]);
-            addModel();
-        }
-    }
 }
 
 
