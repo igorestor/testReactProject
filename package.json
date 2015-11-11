@@ -1,8 +1,8 @@
 {
-  "name": "myProject",
+  "name": "pamyatnikov.com_project",
   "version": "0.0.1",
   "author": "Willy Barankin",
-  "description": "",
+  "description": "Dependency for pamyatnikov.com project",
   "dependencies": {
     "react": "latest",
     "react-dom": "latest",

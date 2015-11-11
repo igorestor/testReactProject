@@ -17,11 +17,11 @@ module.exports = function(grunt) {
                 src: 'src/js/app.jsx',
                 dest: 'build/js/bundle.js',
                 options: {
-                    debug: true,
+                    debug: false,
                     extensions: ['.jsx'],
                     transform: [["babelify", {presets: ["es2015", "react"]}]],
                     browserifyOptions: {
-                        debug: true
+                        debug: false
                     }
                 }
             }
