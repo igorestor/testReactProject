@@ -237,7 +237,7 @@ function _init() {
 }
 
 
-function _addModel(el) {
+function _addModel(el, tX, tZ) {
     var manager = new THREE.LoadingManager();
     var loader = new THREE.OBJLoader( manager );
     loader.load( el.model, function ( object ) {
@@ -248,10 +248,13 @@ function _addModel(el) {
             }
         } );
 
+        tX = tX || 0;
+        tZ = tZ || 0;
+
         object.rotation.x = -0.5*Math.PI;
         object.position.y = 0;
-        object.position.z = -92;
-        object.position.x = -58;
+        object.position.z = -92 + tZ;
+        object.position.x = -58 + tX;
 
         scene.add( object );
 
@@ -341,6 +344,17 @@ _animate();
 _addModel({model: '3d/models/Headstone_1.obj'});
 _addModel({model: '3d/models/Mound.obj'});
 _addModel({model: '3d/models/Fence.obj'});
+
+
+for (var i=-3200; i<3200; i=i+800) {
+    for (var j=-3200; j<3200; j=j+800) {
+        if (i != 0 || j !=0) {
+            _addModel({model: '3d/models/Fence.obj'}, i, j);
+        }
+    }
+}
+
+
 
     //*************************************************
 
