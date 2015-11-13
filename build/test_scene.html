@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<div id="content"></div>
+
 
 <script src="http://threejs.org/build/three.min.js"></script>
 <script src="http://threejs.org/examples/js/loaders/OBJLoader.js"></script>
@@ -18,8 +18,13 @@
 <script src="http://threejs.org/examples/js/libs/stats.min.js"></script>
 <script type="text/javascript" src="3d/test/dat.gui.js"></script>
 
-<script>
+<style>
+    body {
+        margin: 0;
+    }
+</style>
 
+<script>
 
 var container,
         camera, scene, renderer,
@@ -30,7 +35,7 @@ var container,
 
         controls, stats, mesh,
 
-        skybox, plane;
+        skybox, plane, dirLight;
 
 
 var manager = new THREE.LoadingManager();
@@ -51,26 +56,26 @@ var texture = new THREE.Texture();
 
 /** GUI Control */
 var controlsGui = new function() {
-    this.panoramY = 2469;
+//    this.panoramY = 2469;
 //    this.planeSize = 400;
 };
 var gui = new dat.GUI();
-gui.add(controlsGui, 'panoramY',0,2500);
+//gui.add(controlsGui, 'panoramY',0,2500);
 //gui.add(controlsGui, 'planeSize',0,1000);
 
 
 function _init() {
     /** SCENE */
     scene = new THREE.Scene();
-
+    scene.fog = new THREE.Fog( 0xffffff, 1000, 4000 );
 
     /** CAMERA */
-    var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
+    var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight-4;
     var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
     camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
-    camera.position.x = 250;
-    camera.position.y = 350;
-    camera.position.z = 500;
+    camera.position.x = 200;
+    camera.position.y = 300;
+    camera.position.z = 450;
     scene.add(camera);
 
 
@@ -78,8 +83,12 @@ function _init() {
     renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+    renderer.setClearColor( scene.fog.color );
     //renderer.setClearColor( 0x003300 );
-    renderer.setClearColor( 0xaaaaaa );
+    //renderer.setClearColor( 0xaaaaaa );
+    renderer.gammaInput = true;
+    renderer.gammaOutput = true;
+    renderer.shadowMap.enabled = true;
 
     container = document.createElement( 'div' );
     document.body.appendChild( container );
@@ -89,7 +98,7 @@ function _init() {
     /** CONTROLS */
     controls = new THREE.OrbitControls( camera, renderer.domElement );
 
-    controls.maxPolarAngle = Math.PI/2; //ground limit
+    controls.maxPolarAngle = Math.PI/2.3; //ground limit
 
     controls.enableDamping = true;
     controls.dampingFactor = 0.25;
@@ -97,12 +106,32 @@ function _init() {
 
 
     /** LIGHT */
-    var ambient = new THREE.AmbientLight( 0xffffff );
-    scene.add( ambient );
+//    var ambient = new THREE.AmbientLight( 0xffffff );
+//    scene.add( ambient );
+//
+//    var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+//    directionalLight.position.set( 0, 0, 1 );
+//    scene.add( directionalLight );
 
-    var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-    directionalLight.position.set( 0, 0, 1 );
-    scene.add( directionalLight );
+    scene.add( new THREE.AmbientLight( 0x222222 ) );
+
+    dirLight = new THREE.DirectionalLight( 0xffffff, 2.0 );
+    dirLight.position.set( 200, 450, 500 );
+
+    dirLight.castShadow = true;
+    dirLight.shadowMapWidth = 1024;
+    dirLight.shadowMapHeight = 1024;
+    dirLight.shadowMapDarkness = 0.95;
+    dirLight.shadowCameraVisible = true;
+    dirLight.shadowCameraNear = 100;
+    dirLight.shadowCameraFar = 1200;
+    dirLight.shadowCameraTop = 350;
+    dirLight.shadowCameraBottom = -350;
+    dirLight.shadowCameraRight = 1000;
+    dirLight.shadowCameraLeft = -1000;
+
+    scene.add( dirLight );
+
 
 
     /** SKYBOX/FOG */
@@ -149,46 +178,53 @@ function _init() {
 
 
     /** AXES (__helpers__) */
-    var axes = new THREE.AxisHelper( 200 );
-    axes.position.y = -30;
-    scene.add(axes);
-    var planeGeometry = new THREE.PlaneGeometry(400,400);
-    var planeMaterial = new THREE.MeshBasicMaterial(
-            {color: 0x457f32, wireframe: false });
-    plane = new THREE.Mesh(planeGeometry,planeMaterial);
-    plane.rotation.x = -0.5*Math.PI;
-    plane.position.x = 0;
-    plane.position.y = -30;
-    plane.position.z = 0;
-    scene.add(plane);
+//    var axes = new THREE.AxisHelper( 200 );
+//    axes.position.y = -30;
+//    scene.add(axes);
+//    var planeGeometry = new THREE.PlaneGeometry(400,400);
+//    var planeMaterial = new THREE.MeshBasicMaterial(
+//            {color: 0x457f32, wireframe: false });
+//    plane = new THREE.Mesh(planeGeometry,planeMaterial);
+//    plane.rotation.x = -0.5*Math.PI;
+//    plane.position.x = 0;
+//    plane.position.y = -30;
+//    plane.position.z = 0;
+//    scene.add(plane);
 
 
 
-        var geometryGrass = new THREE.PlaneBufferGeometry( 400, 400 );
+    /**  GROUND */
+    var gt = THREE.ImageUtils.loadTexture( "3d/test/grasslight-big.jpg" );
+    var gg = new THREE.PlaneBufferGeometry( 16000, 16000 );
+    var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
+    var ground = new THREE.Mesh( gg, gm );
+    ground.rotation.x = - Math.PI / 2;
+    ground.material.map.repeat.set( 64, 64 );
+    ground.material.map.wrapS = THREE.RepeatWrapping;
+    ground.material.map.wrapT = THREE.RepeatWrapping;
+    ground.receiveShadow = true;
+    scene.add( ground );
 
-        var textureGrass = new THREE.CanvasTexture( _generateTexture() );
 
-        for ( var i = 0; i < 15; i ++ ) {
 
-            var materialGrass = new THREE.MeshBasicMaterial( {
-                color: new THREE.Color().setHSL( 0.3, 0.75, ( i / 15 ) * 0.4 + 0.1 ),
-                map: textureGrass,
-                //depthTest: false,
-                depthWrite: false,
-                transparent: true
-            } );
+    /** GRASS */
+    var geometryGrass = new THREE.PlaneBufferGeometry( 310, 310 );
+    var textureGrass = new THREE.CanvasTexture( _generateGrassTexture() );
 
-            var mesh = new THREE.Mesh( geometryGrass, materialGrass );
-
-            mesh.position.y = i * 0.25 - 30;
-            mesh.rotation.x = - Math.PI / 2;
-
-            scene.add( mesh );
-
-        }
-
-        //scene.children.reverse();
-
+    for ( var i = 0; i < 15; i ++ ) {
+        var materialGrass = new THREE.MeshBasicMaterial( {
+            color: new THREE.Color().setHSL( 0.3, 0.75, ( i / 15 ) * 0.4 + 0.1 ),
+            map: textureGrass,
+            //depthTest: false,
+            depthWrite: false,
+            transparent: true
+        } );
+        var meshGrass = new THREE.Mesh( geometryGrass, materialGrass );
+        meshGrass.position.y = i * 0.25 + 1;
+        meshGrass.rotation.x = - Math.PI / 2;
+        scene.add( meshGrass );
+    }
+    //scene.children.reverse();
     var time = Date.now() / 6000;
     for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
         if (scene.children[ i ]['type'] == "Mesh") {
@@ -196,7 +232,6 @@ function _init() {
             mesh.position.x = Math.sin( time * 2 ) * i * i * 0.005;
             mesh.position.z = Math.cos( time * 4 ) * i * i * 0.005;
         }
-
     }
 
 }
@@ -209,13 +244,14 @@ function _addModel(el) {
         object.traverse( function ( child ) {
             if ( child instanceof THREE.Mesh ) {
                 child.material.map = texture;
+                child.castShadow = true;
             }
         } );
 
         object.rotation.x = -0.5*Math.PI;
-        object.position.y = -30;
-        object.position.z = -90;
-        object.position.x = -60;
+        object.position.y = 0;
+        object.position.z = -92;
+        object.position.x = -58;
 
         scene.add( object );
 
@@ -224,14 +260,14 @@ function _addModel(el) {
 }
 
 
-function _generateTexture() {
+function _generateGrassTexture() {
     var canvas = document.createElement( 'canvas' );
     canvas.width = 2012;
     canvas.height = 2012;
 
     var context = canvas.getContext( '2d' );
 
-    for ( var i = 0; i < 160000; i ++ ) {
+    for ( var i = 0; i < 100000; i ++ ) {
 
         context.fillStyle = 'hsl(0,0%,' + ( Math.random() * 50 + 50 ) + '%)';
         context.beginPath();
@@ -274,7 +310,7 @@ function render() {
     //TODO: For tuning
     //skybox.position.y = controlsGui.panoramY;
 
-//        var time = Date.now() / 6000;
+       // var time = Date.now() / 6000;
 
         //camera.position.x = 80 * Math.cos( time );
         //camera.position.z = 80 * Math.sin( time );
@@ -291,6 +327,11 @@ function render() {
 //        }
 
     renderer.render( scene, camera );
+
+//    var time = performance.now() * 0.001;
+//    dirLight.position.x = Math.sin( time * 1.1 ) * 9;
+//    dirLight.position.y = Math.sin( time * 1.1 ) * 9;
+//    dirLight.position.z = Math.sin( time * 1.2 ) * 9;
 }
 
 
