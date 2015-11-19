@@ -40,6 +40,20 @@ module.exports = {
                     group: 'g_3',
                     isActive: true,
                     model: '3d/models/Fence.obj'
+                },
+
+
+                {
+                    id: 'e_3',
+                    name: 'Памятник капля',
+                    group: 'g_1',
+                    model: '3d/models/blob_stella.obj'
+                },
+                {
+                    id: 'e_2',
+                    name: 'Цветник капля',
+                    group: 'g_2',
+                    model: '3d/models/blob_parterre.obj'
                 }
             ]
         });

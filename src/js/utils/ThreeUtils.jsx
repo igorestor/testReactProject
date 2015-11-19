@@ -30,11 +30,11 @@ var texture = new THREE.Texture();
 
 /** GUI Control */
 var controlsGui = new function() {
-    this.panoramY = 2469;
+//    this.panoramY = 2469;
 //    this.planeSize = 400;
 };
 var gui = new dat.GUI();
-gui.add(controlsGui, 'panoramY',0,2500);
+//gui.add(controlsGui, 'panoramY',0,2500);
 //gui.add(controlsGui, 'planeSize',0,1000);
 
 
@@ -57,6 +57,9 @@ function _init() {
     renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+    renderer.setClearColor( 0xaaaaaa );
+
+
     container = document.createElement( 'div' );
     document.body.appendChild( container );
     container.appendChild(renderer.domElement);
@@ -97,7 +100,7 @@ function _init() {
 
     skybox = new THREE.Mesh(skyboxGeom, skyboxMaterial);
     skybox.position.y = 2469;
-    scene.add(skybox);
+    //scene.add(skybox);
 
 
     manager.onProgress = function ( item, loaded, total ) {
@@ -126,16 +129,16 @@ function _init() {
 
     /** AXES (__helpers__) */
     var axes = new THREE.AxisHelper( 200 );
-    axes.position.y = -30;
+    //axes.position.y = -30;
     scene.add(axes);
     var planeGeometry = new THREE.PlaneGeometry(400,400);
     var planeMaterial = new THREE.MeshBasicMaterial(
-        {color: 0x457f32, wireframe: false });
+        {color: 0x457f32, wireframe: true });
     plane = new THREE.Mesh(planeGeometry,planeMaterial);
     plane.rotation.x = -0.5*Math.PI;
-    plane.position.x = 0;
-    plane.position.y = -30;
-    plane.position.z = 0;
+    //plane.position.x = 0;
+    //plane.position.y = -30;
+    //plane.position.z = 0;
     scene.add(plane);
 }
 
@@ -165,7 +168,7 @@ function _animate() {
 
 function render() {
     //TODO: For tuning
-    skybox.position.y = controlsGui.panoramY;
+    //skybox.position.y = controlsGui.panoramY;
 
     renderer.render( scene, camera );
 }
@@ -193,9 +196,9 @@ var ThreeUtils = {
             object.elementId = el.elementId;
 
             object.rotation.x = -0.5*Math.PI;
-            object.position.y = -30;
-            object.position.z = -90;
-            object.position.x = -60;
+            //object.position.y = -30;
+            //object.position.z = -90;
+            //object.position.x = -60;
 
             scene.add( object );
 
