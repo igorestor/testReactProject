@@ -38,6 +38,10 @@ var container,
         skybox, plane, dirLight;
 
 
+var oldFogOn = false;
+var oldFogExp = false;
+
+
 var manager = new THREE.LoadingManager();
 
 //TODO: remove for release
@@ -55,14 +59,37 @@ var texture = new THREE.Texture();
 
 
 /** GUI Control */
-var controlsGui = new function() {
-//    this.panoramY = 2469;
-//    this.planeSize = 400;
+var effectController = {
+    fogOn:false,
+    fogNear:867,
+    fogFar:1734,
+    fogExp:false,
+    fogDensity:0.0004,
+
+    red:1,
+    green:1,
+    blue:1
 };
 var gui = new dat.GUI();
-//gui.add(controlsGui, 'panoramY',0,2500);
-//gui.add(controlsGui, 'planeSize',0,1000);
+gui.add(effectController, "fogNear", 0, 10000).name("linear fog: near").onChange( fogChanger );
+gui.add(effectController, "fogFar", 0, 10000).name("linear fog: far").onChange( fogChanger );
+gui.add(effectController, "red", 0,1).name("red").onChange( fogChanger );
+gui.add(effectController, "green", 0,1).name("green").onChange( fogChanger );
+gui.add(effectController, "blue", 0,1).name("blue").onChange( fogChanger );
 
+
+function fogChanger() {
+    var hex =
+            (Math.floor(effectController.red*255) << 16) |
+            (Math.floor(effectController.green*255) << 8) |
+            (Math.floor(effectController.blue*255));
+    renderer.setClearColor( hex, 1.0 );
+
+
+    scene.fog = new THREE.Fog( hex, effectController.fogNear,
+            // don't allow near > far
+            ( effectController.fogFar >= effectController.fogNear ) ? effectController.fogFar : effectController.fogNear );
+}
 
 function _init() {
     /** SCENE */
@@ -83,7 +110,9 @@ function _init() {
     renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+
     renderer.setClearColor( scene.fog.color );
+
     //renderer.setClearColor( 0x003300 );
     //renderer.setClearColor( 0xaaaaaa );
     renderer.gammaInput = true;
@@ -119,16 +148,16 @@ function _init() {
     dirLight.position.set( 200, 450, 500 );
 
     dirLight.castShadow = true;
-    dirLight.shadowMapWidth = 1024;
-    dirLight.shadowMapHeight = 1024;
-    dirLight.shadowMapDarkness = 0.95;
-    dirLight.shadowCameraVisible = true;
-    dirLight.shadowCameraNear = 100;
-    dirLight.shadowCameraFar = 1200;
-    dirLight.shadowCameraTop = 350;
-    dirLight.shadowCameraBottom = -350;
-    dirLight.shadowCameraRight = 1000;
-    dirLight.shadowCameraLeft = -1000;
+//    dirLight.shadowMapWidth = 1024;
+//    dirLight.shadowMapHeight = 1024;
+    dirLight.shadowDarkness = 0.8;
+    dirLight.shadowCameraVisible = false;
+//    dirLight.shadowCameraNear = 100;
+//    dirLight.shadowCameraFar = 1200;
+//    dirLight.shadowCameraTop = 350;
+//    dirLight.shadowCameraBottom = -350;
+//    dirLight.shadowCameraRight = 1000;
+//    dirLight.shadowCameraLeft = -1000;
 
     scene.add( dirLight );
 
@@ -196,7 +225,7 @@ function _init() {
     /**  GROUND */
     var gt = THREE.ImageUtils.loadTexture( "3d/test/grasslight-big.jpg" );
     var gg = new THREE.PlaneBufferGeometry( 16000, 16000 );
-    var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
+    var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt, shininess: 5} );
     var ground = new THREE.Mesh( gg, gm );
     ground.rotation.x = - Math.PI / 2;
     ground.material.map.repeat.set( 64, 64 );
@@ -234,17 +263,20 @@ function _init() {
         }
     }
 
+
+    fogChanger();
 }
 
 
-function _addModel(el, tX, tZ) {
+function _addModel(el, tX, tZ, shadow) {
+    shadow = shadow || false;
     var manager = new THREE.LoadingManager();
     var loader = new THREE.OBJLoader( manager );
     loader.load( el.model, function ( object ) {
         object.traverse( function ( child ) {
             if ( child instanceof THREE.Mesh ) {
                 child.material.map = texture;
-                child.castShadow = true;
+                child.castShadow = shadow;
             }
         } );
 
@@ -331,19 +363,19 @@ function render() {
 
     renderer.render( scene, camera );
 
-//    var time = performance.now() * 0.001;
-//    dirLight.position.x = Math.sin( time * 1.1 ) * 9;
-//    dirLight.position.y = Math.sin( time * 1.1 ) * 9;
-//    dirLight.position.z = Math.sin( time * 1.2 ) * 9;
+    var time = performance.now() * 0.0005;
+    dirLight.position.x = Math.sin( time * 1.1 ) * 1000;
+    dirLight.position.y = (Math.sin( time * 1.1 )+1) * 1000;
+    dirLight.position.z = Math.cos( time * 1.1 ) * 1000;
 }
 
 
 _init();
 _animate();
 
-_addModel({model: '3d/models/Headstone_1.obj'});
-_addModel({model: '3d/models/Mound.obj'});
-_addModel({model: '3d/models/Fence.obj'});
+_addModel({model: '3d/models/Headstone_1.obj'}, 0, 0, true);
+_addModel({model: '3d/models/Mound.obj'}, 0, 0, true);
+_addModel({model: '3d/models/Fence.obj'}, 0, 0, true);
 
 
 for (var i=-3200; i<3200; i=i+800) {
