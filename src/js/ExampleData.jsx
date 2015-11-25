@@ -45,15 +45,15 @@ module.exports = {
 
                 {
                     id: 'e_3',
-                    name: 'Памятник капля',
+                    name: 'Новый памятник',
                     group: 'g_1',
-                    model: '3d/models/blob_stella.obj'
+                    model: '3d/models/1_2.obj'
                 },
                 {
                     id: 'e_2',
-                    name: 'Цветник капля',
+                    name: 'Новый цветник',
                     group: 'g_2',
-                    model: '3d/models/blob_parterre.obj'
+                    model: '3d/models/2_2.obj'
                 }
             ]
         });
